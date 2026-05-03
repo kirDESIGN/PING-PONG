@@ -1,4 +1,5 @@
 from pygame import *
+import random
 
 #background music
 mixer.init()
@@ -17,14 +18,15 @@ background = transform.scale(image.load(img_background), (win_width, win_height)
 
 class GameSprite(sprite.Sprite):
  #конструктор класса
-    def __init__(self, player_image, player_x, player_y, size_x, size_y, player_speed):
+    def __init__(self, player_image, player_x, player_y, size_x, size_y, player_speedX, player_speedY):
         #вызываем конструктор класса (Sprite):
         sprite.Sprite.__init__(self)
 
 
         #каждый спрайт должен хранить свойство image - изображение
         self.image = transform.scale(image.load(player_image), (size_x, size_y))
-        self.speed = player_speed
+        self.speedX = player_speedX
+        self.speedY = player_speedY
 
 
         #каждый спрайт должен хранить свойство rect - прямоугольник, в который он вписан
@@ -39,18 +41,35 @@ class Player(GameSprite):
     def updateL(self):
         keys = key.get_pressed()
         if keys[K_w] and self.rect.y > 5:
-            self.rect.y -= self.speed
+            self.rect.y -= self.speedY
         if keys[K_s] and self.rect.y < win_height - 300:
-            self.rect.y += self.speed
+            self.rect.y += self.speedY
     def updateR(self):
         keys = key.get_pressed()
-        if keys[K_UP] and self.rect.y > 5:
-            self.rect.y -= self.speed
-        if keys[K_DOWN] and self.rect.y < win_height - 300:
-            self.rect.y += self.speed
+        if keys[K_i] and self.rect.y > 5:
+            self.rect.y -= self.speedY
+        if keys[K_k] and self.rect.y < win_height - 300:
+            self.rect.y += self.speedY
 
-RocketL = Player(img_Lrocket, 50, 50, 50, 300, 10)
-RocketR = Player(img_Rrocket,win_width - 100, 50, 50, 300, 10)
+class Ball(GameSprite):
+
+    def update(self):
+        self.rect.x += self.speedX
+        self.rect.y += self.speedY
+        if sprite.collide_rect(self, RocketL) or sprite.collide_rect(self, RocketR):
+            self.speedY = random.randint(1, 10)
+            self.speedX = -self.speedX
+            if random.randint(1, 2) == 1:
+                self.speedY = -self.speedY
+        if self.rect.y <= 5 or self.rect.y >= win_height - 100:
+            self.speedY = -self.speedY
+
+
+
+
+RocketL = Player(img_Lrocket, 50, 50, 50, 300, 10, 10)
+RocketR = Player(img_Rrocket, win_width - 100, 50, 50, 300, 10, 10)
+ball = Ball(img_ball, 500, 500, 100, 100, 5, 2)
 
 
 clock = time.Clock()
@@ -66,9 +85,11 @@ while run:
     window.blit(background,(0,0))
     RocketL.reset()
     RocketR.reset()
+    ball.reset()
 
     RocketR.updateR()
     RocketL.updateL()
+    ball.update()
 
     display.update()
     clock.tick(FPS)
