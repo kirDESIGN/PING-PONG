@@ -71,25 +71,40 @@ RocketL = Player(img_Lrocket, 50, 50, 50, 300, 10, 10)
 RocketR = Player(img_Rrocket, win_width - 100, 50, 50, 300, 10, 10)
 ball = Ball(img_ball, 500, 500, 100, 100, 5, 2)
 
+font = font.Font(None, 70)
+red_win = font.render(
+    'RED WIN!', True, (250, 0, 0)
+)
+blue_win = font.render(
+    'BLUE WIN!', True, (0, 0, 250)
+)
 
 clock = time.Clock()
 FPS = 60
 
+finish = False
 run = True
 while run:
    #событие нажатия на кнопку Закрыть
     for e in event.get():
         if e.type == QUIT:
             run = False
-    
-    window.blit(background,(0,0))
-    RocketL.reset()
-    RocketR.reset()
-    ball.reset()
+    if not finish:
+        window.blit(background,(0,0))
+        RocketL.reset()
+        RocketR.reset()
+        ball.reset()
 
-    RocketR.updateR()
-    RocketL.updateL()
-    ball.update()
+        RocketR.updateR()
+        RocketL.updateL()
+        ball.update()
 
-    display.update()
-    clock.tick(FPS)
+        if ball.rect.x <= 5:
+            window.blit(blue_win, (600, 500))
+            finish = True
+        if ball.rect.x >= win_width - 100:
+            window.blit(red_win, (600, 500))
+            finish = True
+
+        display.update()
+        clock.tick(FPS)
