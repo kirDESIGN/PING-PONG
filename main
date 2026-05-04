@@ -5,6 +5,9 @@ import random
 mixer.init()
 font.init()
 
+knock_sound = mixer.Sound('knock_ball.mp3')
+miss_sound = mixer.Sound('ball_miss.mp3')
+
 img_Lrocket = 'Lrocket.png'
 img_Rrocket = 'Rrocket.png'
 img_ball = 'ball_without_back.png'
@@ -57,11 +60,13 @@ class Ball(GameSprite):
         self.rect.x += self.speedX
         self.rect.y += self.speedY
         if sprite.collide_rect(self, RocketL) or sprite.collide_rect(self, RocketR):
+            knock_sound.play()
             self.speedY = random.randint(1, 10)
             self.speedX = -self.speedX
             if random.randint(1, 2) == 1:
                 self.speedY = -self.speedY
         if self.rect.y <= 5 or self.rect.y >= win_height - 100:
+            knock_sound.play()
             self.speedY = -self.speedY
 
 
@@ -101,9 +106,11 @@ while run:
 
         if ball.rect.x <= 5:
             window.blit(blue_win, (600, 500))
+            miss_sound.play()
             finish = True
         if ball.rect.x >= win_width - 100:
             window.blit(red_win, (600, 500))
+            miss_sound.play()
             finish = True
 
         display.update()
